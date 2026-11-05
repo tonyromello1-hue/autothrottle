@@ -1,0 +1,94 @@
+{{define "content"}}
+<header class="at-page-head">
+  <div style="display:grid;gap:var(--space-2)">
+    <h1 class="at-page-title">Backup</h1>
+    <p class="at-page-sub">Your whole setup as a code you screenshot, with Pack It Up. Hand the screenshot back to any AutoThrottle to restore it.</p>
+  </div>
+</header>
+
+{{if .Error}}{{template "alert" dict "Tone" "error" "Title" "No backup made" "Body" .Error}}<div style="height:var(--space-6)"></div>{{end}}
+
+{{if .Restored}}
+<section class="at-card at-piu-done" style="margin-bottom:var(--space-8)">
+  <header class="at-card-head"><h2 class="at-card-title">Setup restored</h2></header>
+  <p class="at-piu-lead">Backup v{{.RestoredMeta.Version}} is in place: {{count .Restored.Servers "media server" "media servers"}}, {{count .Restored.Clients "download client" "download clients"}} and {{count .Restored.Mappings "mapping" "mappings"}}. The watchers are connecting now.</p>
+  {{range .Notes}}<p class="at-piu-note">{{.}}</p>{{end}}
+  {{with .NeedCredentialsNote}}
+    {{template "alert" dict "Title" "Some connections need their token or password again" "Body" .}}
+  {{end}}
+  <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-6)">
+    <a class="at-btn at-btn--primary at-btn--md" href="/">Open the Dashboard</a>
+    <a class="at-btn at-btn--md" href="/configuration">Review connections</a>
+  </div>
+</section>
+{{end}}
+
+<div class="at-piu-grid">
+  {{/* --- pack --- */}}
+  <section class="at-card" id="pack">
+    <header class="at-card-head"><h2 class="at-card-title">Make a backup</h2></header>
+    {{if .Codes}}
+      <div class="at-piu-sheet" aria-label="Your backup">
+        <div class="at-piu-sheet-head">
+          <div><b>Pack It Up</b><span>AutoThrottle backup</span></div>
+          <div class="at-piu-sheet-id"><b>{{.Meta.Workspace}} <em>v{{.Meta.Version}}</em></b><span>{{.Made}} · {{count .Packed.Servers "server" "servers"}} · {{count .Packed.Clients "client" "clients"}}{{if .Locked}} · PIN locked{{end}}</span></div>
+        </div>
+        {{$n := len .Codes}}
+        {{range .Codes}}
+          <figure class="at-piu-code">{{.SVG}}<figcaption>Part {{.Part}} of {{$n}}</figcaption></figure>
+        {{end}}
+        <p class="at-piu-sheet-foot"><b>Screenshot this.</b> {{if eq $n 1}}This code is{{else}}These codes are{{end}} your whole AutoThrottle setup{{if .Locked}}, tokens and passwords included, locked with your PIN{{else}}, without tokens or passwords{{end}}.</p>
+      </div>
+      <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-6)">
+        <a class="at-btn at-btn--md" href="{{.FileHref}}" download="{{.FileName}}" hx-boost="false">Download as a file</a>
+        <button type="button" class="at-btn at-btn--md" data-piu-copy="piu-codetext">Copy the code text</button>
+      </div>
+      <textarea id="piu-codetext" class="at-input at-input--mono at-piu-codetext" readonly rows="3" aria-label="The backup as text">{{.CodeText}}</textarea>
+      {{if not .Locked}}<p class="at-piu-note">Made without a PIN, so this backup carries no tokens or passwords. Restored connections come back switched off until you enter them again.</p>{{end}}
+      <p class="at-piu-note">A forgotten PIN can't be recovered: there is no server and no reset.</p>
+      <a class="at-btn at-btn--ghost" href="/backup" style="justify-self:start;margin-top:var(--space-4)">Make another</a>
+    {{else if .HasSetup}}
+      <p class="at-piu-lead">This setup has {{count .Current.Servers "media server" "media servers"}}, {{count .Current.Clients "download client" "download clients"}} and {{count .Current.Mappings "mapping" "mappings"}}. The log and history stay here; they rebuild themselves.</p>
+      <form method="post" action="/backup/pack" class="at-piu-form">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <label class="at-field"><span class="at-field-label">PIN</span>
+          <input class="at-input at-input--mono" type="password" name="pin" inputmode="numeric" autocomplete="new-password" minlength="4" placeholder="At least 4 characters">
+          <span class="at-field-hint">With a PIN, the backup carries every token and password, encrypted. Leave it empty for a backup without them.</span></label>
+        <label class="at-field"><span class="at-field-label">PIN again</span>
+          <input class="at-input at-input--mono" type="password" name="pin_confirm" inputmode="numeric" autocomplete="new-password"></label>
+        <button type="submit" class="at-btn at-btn--primary at-btn--md" style="justify-self:start">Pack it up</button>
+      </form>
+    {{else}}
+      {{template "emptystate" dict "Title" "Nothing to back up yet" "Body" "Add a media server or a download client first, or restore a backup here." "ActionHref" "/configuration" "ActionLabel" "Add a connection"}}
+    {{end}}
+  </section>
+
+  {{/* --- restore --- */}}
+  <section class="at-card" id="restore">
+    <header class="at-card-head"><h2 class="at-card-title">Restore a backup</h2></header>
+    {{if .RestoreError}}{{template "alert" dict "Tone" "error" "Title" "Nothing was restored" "Body" .RestoreError}}{{end}}
+    {{if and .Notes (not .Restored)}}{{range .Notes}}<p class="at-piu-note">{{.}}</p>{{end}}{{end}}
+    <form method="post" action="/backup/restore" class="at-piu-form" data-piu-restore>
+      <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+      <label class="at-field"><span class="at-field-label">Screenshots or the backup file</span>
+        <input class="at-input" type="file" accept="image/*,.atpack,text/plain" multiple data-piu-files>
+        <span class="at-field-hint" data-piu-status>Pick every screenshot of one backup, in any order. They're read here in your browser.</span></label>
+      <label class="at-field"><span class="at-field-label">Codes</span>
+        <textarea class="at-input at-input--mono at-piu-codetext" name="codes" rows="3" placeholder="PIU1*AUTOTHROTTLE*…" data-piu-codes>{{.RestoreCodes}}</textarea>
+        <span class="at-field-hint">Filled in from what you pick above, or paste the code text.</span></label>
+      <label class="at-field"><span class="at-field-label">PIN{{if .NeedPIN}} <b class="at-piu-need">needed</b>{{end}}</span>
+        <input class="at-input at-input--mono{{if .NeedPIN}} at-input--invalid{{end}}" type="password" name="pin" inputmode="numeric" autocomplete="off" placeholder="Only if the backup has one"{{if .NeedPIN}} autofocus{{end}}>
+        {{if .NeedPIN}}<span class="at-field-hint">This backup is locked. Enter the PIN it was made with.</span>{{end}}</label>
+      {{if .HasSetup}}
+      <label class="at-check-label">
+        <input class="at-checkbox" type="checkbox" name="replace">
+        <span class="at-check-text"><span>Replace my current setup</span><span class="at-field-hint">Its {{count .Current.Servers "media server" "media servers"}} and {{count .Current.Clients "download client" "download clients"}} are swapped for the backup's.</span></span>
+      </label>
+      {{end}}
+      <button type="submit" class="at-btn at-btn--primary at-btn--md" style="justify-self:start">Restore</button>
+    </form>
+  </section>
+</div>
+<script src="{{call .Asset "/static/js/jsqr.min.js"}}" defer></script>
+<script src="{{call .Asset "/static/js/packitup.js"}}" defer></script>
+{{end}}

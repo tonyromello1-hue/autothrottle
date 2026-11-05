@@ -1537,3 +1537,28 @@ html[data-theme-mode="dark"] .at-themetoggle-label[data-mode="dark"] { display: 
 .at-paused .at-paused-resume { background: var(--at-ink); border-color: var(--at-ink); color: #fff; }
 .at-paused .at-paused-resume:hover { background: color-mix(in srgb, var(--at-ink) 82%, #fff); border-color: var(--at-ink); color: #fff; }
 @media (max-width: 760px) { .at-paused { padding: 12px 16px; } }
+
+/* ── Backup (Pack It Up) ───────────────────────────────────────── */
+.at-piu-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8); align-items: start; }
+@media (max-width: 960px) { .at-piu-grid { grid-template-columns: minmax(0, 1fr); } }
+.at-piu-grid > .at-card { display: grid; gap: var(--space-4); min-width: 0; }
+.at-piu-form { display: grid; gap: var(--space-6); }
+.at-piu-lead { margin: 0; font-size: var(--text-ui); color: var(--text-dim); max-width: 60ch; }
+.at-piu-note { margin: 0; font-size: var(--text-caption); color: var(--text-faint); max-width: 60ch; }
+.at-piu-need { color: var(--critical); font-weight: var(--weight-bold); }
+.at-piu-codetext { resize: vertical; min-height: 4.5em; font-size: var(--text-caption); word-break: break-all; }
+/* The code page stays light in both themes: screenshots get recompressed,
+   and an inverted code confuses some scanners. */
+.at-piu-sheet { background: #ffffff; color: #0a0f1a; border-radius: var(--radius-lg); padding: 16px 16px 12px; border: 1px solid var(--border); max-width: 420px; width: 100%; display: grid; gap: 10px; }
+.at-piu-sheet-head { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid #d7dee7; }
+.at-piu-sheet-head b { display: block; font-size: 15px; white-space: nowrap; }
+.at-piu-sheet-head span { display: block; font-size: 11px; color: #4a5768; margin-top: 3px; }
+.at-piu-sheet-id { text-align: right; }
+.at-piu-sheet-id b { font-family: var(--font-mono); color: #0b8fbf; }
+.at-piu-sheet-id em { font-style: normal; color: #8593a5; font-size: 11px; }
+.at-piu-code { margin: 0; display: grid; gap: 4px; justify-items: center; }
+.at-piu-qr { display: block; width: 100%; max-width: 380px; height: auto; }
+.at-piu-code figcaption { font-family: var(--font-mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #8593a5; }
+.at-piu-sheet-foot { margin: 0; padding-top: 8px; border-top: 1px solid #d7dee7; font-size: 12px; color: #4a5768; }
+.at-piu-sheet-foot b { color: #0a0f1a; }
+.at-piu-done { border-color: var(--good); }

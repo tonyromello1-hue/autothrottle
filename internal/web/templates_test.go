@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/JaiMistry/autothrottle/internal/backup"
 	"github.com/JaiMistry/autothrottle/internal/db"
 )
 
@@ -68,6 +69,16 @@ func TestPagesRender(t *testing.T) {
 				[]logRowView{{Time: "12:00:00", Level: "error", Message: "boom"}}, 2, 20, 1, nil),
 		},
 		"configuration": testConfigPage("connections"),
+		"backup": backupPageData{
+			pageData: testPage("Backup"),
+			Current:  backup.Summary{Servers: 1, Clients: 1, Mappings: 1},
+			HasSetup: true,
+			Codes:    []backupCode{{SVG: "<svg></svg>", Part: 1}},
+			CodeText: "PIU1*AUTOTHROTTLE*…",
+			Restored: &backup.Summary{Servers: 1, NeedCredentials: []string{"Plex"}},
+			NeedPIN:  true,
+			Notes:    []string{"Skipped 1 code from another app."},
+		},
 		"notfound": notFoundData{
 			pageData: pageData{Title: "Page not found", Version: "test", Asset: func(p string) string { return p }},
 			Time:     "14:12:21", Message: "no route for GET /nope",
