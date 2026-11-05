@@ -23,7 +23,7 @@ var templateFS embed.FS
 var staticFS embed.FS
 
 // pages lists the page templates paired with layout.html.
-var pages = []string{"login", "setup", "dashboard", "configuration", "logs", "notfound"}
+var pages = []string{"login", "setup", "dashboard", "configuration", "logs", "backup", "notfound"}
 
 // watcherManager is the watcher surface the web layer needs.
 type watcherManager interface {
@@ -141,6 +141,9 @@ func (s *Server) Router() http.Handler {
 	protected.HandleFunc("GET /logs/rows", s.logRowsFragment)
 	protected.HandleFunc("GET /logs/panel", s.logPanelFragment)
 	protected.HandleFunc("POST /logs/clear", s.clearLogs)
+	protected.HandleFunc("GET /backup", s.backupPage)
+	protected.HandleFunc("POST /backup/pack", s.packBackup)
+	protected.HandleFunc("POST /backup/restore", s.restoreBackup)
 	protected.HandleFunc("GET /dashboard/live", s.dashboardLive)
 	protected.HandleFunc("GET /paused-banner", s.pausedBanner)
 	protected.HandleFunc("GET /events", s.liveEvents)

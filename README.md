@@ -36,6 +36,7 @@ AutoThrottle slows your download clients while playback is detected on your medi
 - **Local playback exemption:** Streams on your own network can be ignored, so only remote connections count.
 - **Mappings:** Control which media servers throttle which download clients.
 - **Restart/crash-safe:** Rates are reapplied on startup, so nothing stays stuck slow.
+- **Screenshot backups:** Your whole setup packs into a QR code you screenshot, and restores on any fresh install, with [Pack It Up](#-backup-and-restore).
 - **Throttle history:** A 7- and 30-day heatmap of when your downloads were held back.
 - **Secure:** All sensitive credentials are securely encrypted and never leaked.
 - **Lightweight:** A single distroless image with a minimal footprint.
@@ -152,6 +153,23 @@ happens on the **Configuration** page:
 
    Rates are in KB/s, and `0` means unlimited.
 3. **Map them.** Choose which media servers throttle which download clients.
+
+## 💾 Backup and restore
+
+The **Backup** page packs your setup into a QR code, with Pack It Up. Screenshot
+it, and the picture is the backup: it goes wherever your photos already go.
+
+- **With a PIN**, the backup carries every token and password, encrypted with
+  AES-256-GCM under a key made from the PIN. A forgotten PIN can't be recovered.
+- **Without a PIN**, it carries no secrets. Restored connections come back
+  switched off until you enter their tokens and passwords again.
+
+To restore, create your account on the new install, open **Backup**, and pick
+the screenshot (or the downloaded `.atpack` file). It's read in your browser,
+and only the code's text is sent to AutoThrottle. Media servers, download
+clients, their rates, mappings and the throttling switch come back; the event
+log and history stay with the old install. Restoring over an existing setup
+replaces it.
 
 ## License
 
