@@ -164,9 +164,18 @@ it, and the picture is the backup: it goes wherever your photos already go.
 - **Without a PIN**, it carries no secrets. Restored connections come back
   switched off until you enter their tokens and passwords again.
 
-To restore, create your account on the new install, open **Backup**, and pick
-the screenshot (or the downloaded `.atpack` file). It's read in your browser,
-and only the code's text is sent to AutoThrottle. Media servers, download
+To restore, create your account on the new install and open **Backup** (a new
+install's Dashboard links to it). Then use whatever you have:
+
+- **Hold the code up to your webcam.** This needs the page opened at
+  `localhost` or over HTTPS, as the Windows tray icon opens it; browsers
+  don't allow the camera on a plain `http://` network address.
+- **Paste a screenshot** with Ctrl+V: Win+Shift+S puts one on the clipboard.
+- **Drop or choose** a screenshot, a photo of the code, or the `.atpack` file.
+
+Codes are read in your browser, and only their text is sent to AutoThrottle.
+Once every part of the backup is in, the page asks for the PIN, or restores
+straight away when there's none and nothing to replace. Media servers, download
 clients, their rates, mappings and the throttling switch come back; the event
 log and history stay with the old install. Restoring over an existing setup
 replaces it.

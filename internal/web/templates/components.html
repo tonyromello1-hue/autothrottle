@@ -59,14 +59,15 @@
   {{if .Body}}<span class="at-alert-body">{{.Body}}</span>{{end}}
 </div>{{end}}
 
-{{/* Args: Tone, Title, Body, ActionHref, ActionLabel */}}
+{{/* Args: Tone, Title, Body, ActionHref, ActionLabel, AltHref, AltLabel */}}
 {{define "emptystate"}}<div class="at-empty{{if .Tone}} at-empty--{{.Tone}}{{end}}">
   <h3 class="at-empty-title">{{.Title}}</h3>
   {{if .Body}}<p class="at-empty-body">{{.Body}}</p>{{end}}
   {{/* Targets body: it sits inside self-targeting containers, whose target
        a boosted link would otherwise inherit. */}}
   {{if .ActionLabel}}<div class="at-empty-action"><a href="{{.ActionHref}}" class="at-btn at-btn--primary"
-     hx-target="body" hx-swap="innerHTML">{{.ActionLabel}}</a></div>{{end}}
+     hx-target="body" hx-swap="innerHTML">{{.ActionLabel}}</a>
+    {{- if .AltLabel}} <a href="{{.AltHref}}" class="at-btn" hx-target="body" hx-swap="innerHTML">{{.AltLabel}}</a>{{end}}</div>{{end}}
 </div>{{end}}
 
 {{/* RateFigure. Args: Down, Up (KB/s), Size ("caption" | "ui") */}}

@@ -35,8 +35,10 @@ import (
 const (
 	magic = "PIU1"
 	// ChunkSize is the most blob bytes one code carries: enough for a
-	// typical setup in one code, small enough to scan from a screenshot.
-	ChunkSize = 1100
+	// typical setup in one code, and few enough modules (about 97 across)
+	// to read from a webcam frame, not only from a pixel-perfect
+	// screenshot. A bigger setup takes more codes rather than denser ones.
+	ChunkSize = 500
 	// MinPINLength is the shortest PIN Pack accepts.
 	MinPINLength = 4
 

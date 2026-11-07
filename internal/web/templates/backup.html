@@ -23,7 +23,8 @@
 </section>
 {{end}}
 
-<div class="at-piu-grid">
+{{/* On an empty install, restoring is the likely errand: it comes first. */}}
+<div class="at-piu-grid{{if not .HasSetup}} at-piu-grid--restore-first{{end}}">
   {{/* --- pack --- */}}
   <section class="at-card" id="pack">
     <header class="at-card-head"><h2 class="at-card-title">Make a backup</h2></header>
@@ -68,16 +69,30 @@
     <header class="at-card-head"><h2 class="at-card-title">Restore a backup</h2></header>
     {{if .RestoreError}}{{template "alert" dict "Tone" "error" "Title" "Nothing was restored" "Body" .RestoreError}}{{end}}
     {{if and .Notes (not .Restored)}}{{range .Notes}}<p class="at-piu-note">{{.}}</p>{{end}}{{end}}
-    <form method="post" action="/backup/restore" class="at-piu-form" data-piu-restore>
+    <form method="post" action="/backup/restore" class="at-piu-form" data-piu-restore{{if not .HasSetup}} data-piu-autosubmit{{end}}>
       <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
-      <label class="at-field"><span class="at-field-label">Screenshots or the backup file</span>
-        <input class="at-input" type="file" accept="image/*,.atpack,text/plain" multiple data-piu-files>
-        <span class="at-field-hint" data-piu-status>Pick every screenshot of one backup, in any order. They're read here in your browser.</span></label>
-      <label class="at-field"><span class="at-field-label">Codes</span>
-        <textarea class="at-input at-input--mono at-piu-codetext" name="codes" rows="3" placeholder="PIU1*AUTOTHROTTLE*…" data-piu-codes>{{.RestoreCodes}}</textarea>
-        <span class="at-field-hint">Filled in from what you pick above, or paste the code text.</span></label>
+      {{/* Every way in lands here: drop, paste, pick or scan. */}}
+      <div class="at-piu-drop" data-piu-drop>
+        <div class="at-piu-cam" data-piu-cam hidden>
+          <video class="at-piu-video" data-piu-video muted playsinline aria-label="Webcam view"></video>
+          <span class="at-piu-aim" aria-hidden="true"></span>
+        </div>
+        <p class="at-piu-drop-title">Drop a screenshot or backup file here, or paste one with <kbd>Ctrl</kbd>+<kbd>V</kbd></p>
+        <div class="at-piu-drop-actions">
+          <button type="button" class="at-btn at-btn--primary at-btn--md" data-piu-cam-start hidden>Scan with webcam</button>
+          <button type="button" class="at-btn at-btn--md" data-piu-cam-stop hidden>Stop the webcam</button>
+          <label class="at-btn at-btn--md at-piu-pick">Choose a file
+            <input type="file" accept="image/*,.atpack,text/plain" multiple data-piu-files>
+          </label>
+        </div>
+        <p class="at-piu-status" data-piu-status aria-live="polite">{{if .RestoreCodes}}Codes loaded.{{else}}Screenshots, photos and files are read here in your browser.{{end}}</p>
+      </div>
+      <details class="at-piu-more"{{if and .RestoreCodes (not .NeedPIN)}} open{{end}}>
+        <summary>Paste the code text instead</summary>
+        <textarea class="at-input at-input--mono at-piu-codetext" name="codes" rows="3" placeholder="PIU1*AUTOTHROTTLE*…" aria-label="Code text" data-piu-codes>{{.RestoreCodes}}</textarea>
+      </details>
       <label class="at-field"><span class="at-field-label">PIN{{if .NeedPIN}} <b class="at-piu-need">needed</b>{{end}}</span>
-        <input class="at-input at-input--mono{{if .NeedPIN}} at-input--invalid{{end}}" type="password" name="pin" inputmode="numeric" autocomplete="off" placeholder="Only if the backup has one"{{if .NeedPIN}} autofocus{{end}}>
+        <input class="at-input at-input--mono{{if .NeedPIN}} at-input--invalid{{end}}" type="password" name="pin" inputmode="numeric" autocomplete="off" placeholder="Only if the backup has one" data-piu-pin{{if .NeedPIN}} autofocus{{end}}>
         {{if .NeedPIN}}<span class="at-field-hint">This backup is locked. Enter the PIN it was made with.</span>{{end}}</label>
       {{if .HasSetup}}
       <label class="at-check-label">
@@ -85,7 +100,7 @@
         <span class="at-check-text"><span>Replace my current setup</span><span class="at-field-hint">Its {{count .Current.Servers "media server" "media servers"}} and {{count .Current.Clients "download client" "download clients"}} are swapped for the backup's.</span></span>
       </label>
       {{end}}
-      <button type="submit" class="at-btn at-btn--primary at-btn--md" style="justify-self:start">Restore</button>
+      <button type="submit" class="at-btn at-btn--primary at-btn--md" style="justify-self:start" data-piu-submit>Restore</button>
     </form>
   </section>
 </div>
